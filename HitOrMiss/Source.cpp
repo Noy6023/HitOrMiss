@@ -4,13 +4,10 @@
 
 #define PI (3.14159265)
 #define GRAVITY (500.0f)
-#define MASS (1)
 #define YFORCE (0)
-#define V0 (500.0f)
-#define ANGLE (70.0f)
 sf::Vector2f getAcceleration(float angle)
 {
-	double y = (MASS * GRAVITY * cos(angle * PI / 180.0) + YFORCE * cos(angle * PI / 180.0)) / MASS;
+	double y = (GRAVITY * sin(angle * PI / 180.0) + YFORCE * sin(angle * PI / 180.0));
 	return sf::Vector2f(0, y);
 }
 sf::Vector2f getBombVelocity(float v0, float angle, float dt)
@@ -27,8 +24,7 @@ sf::Vector2f getBombPos(float x0, float y0, float v, float angle, float dt)
 	float ax = 0;
 	sf::Vector2f vt = getBombVelocity(v, angle, dt);
 	double x = x0 + vt.x * cos(angle * PI / 180.0) * dt + 0.5 * ax * dt * dt;
-	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt) + (0.5 * ay * dt * dt);
-	printf("%f, %f", vt.x, vt.y);
+	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt) + (0.5 * ay * dt * dt);	
 	return sf::Vector2f(x, y);
 }
 int main()
@@ -64,11 +60,11 @@ int main()
 	sf::Sprite arrow(arrowT);
 
 	//sizes:
-	const int LENGTH = backgroundT.getSize().y;
+	const int HEIGHT = backgroundT.getSize().y;
 	const int WIDTH = backgroundT.getSize().x;
-	const int GROUND = LENGTH - p1.getTexture()->getSize().y - 50;
+	const int GROUND = HEIGHT - p1.getTexture()->getSize().y - 50;
 
-	sf::RenderWindow window(sf::VideoMode(WIDTH, LENGTH), "HitOrMiss"); //creat window
+	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "HitOrMiss"); //creat window
 
 	//initiate positions:
 	background.setPosition(0, 0);
@@ -76,15 +72,19 @@ int main()
 
 	p2.setPosition(WIDTH- p2.getTexture()->getSize().x,GROUND);
 	bomb.setOrigin(bombT.getSize().x / 2, bombT.getSize().y / 2);
-	bomb.setPosition(100,100);
 	window.setFramerateLimit(60);
+	arrow.setOrigin(0, arrowT.getSize().y / 2);
 
 	//the game loop:
 	float move = 5.0f;
 	double angle = 0;
 	bool isAiming = false;
+	bool isFiring = false;
 	sf::Clock clock;
 	clock.restart();
+	window.setKeyRepeatEnabled(false);
+	sf::Vector2f bombStartPosition;
+	float power = 0;
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -92,7 +92,34 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if (event.type == sf::Event::KeyPressed)
+			{
+				if (event.key.code == sf::Keyboard::Space)
+				{
+					if (!isFiring)
+					{
+						isAiming = true;
+					}
+				}
+			}
+			if (event.type == sf::Event::KeyReleased)
+			{
+				if (event.key.code == sf::Keyboard::Space)
+				{
+					if (!isFiring)
+					{
+						power = arrow.getScale().x * 500;
+						bombStartPosition = sf::Vector2f(p1.getPosition().x + p1tRight.getSize().x, p1.getPosition().y);
+						isFiring = true;
+						clock.restart();
+						isAiming = false;
+						arrow.setScale(1, 1);
+					}
+				}
+			}
 		}
+
+		arrow.setPosition(p1.getPosition().x + p1tRight.getSize().x, p1.getPosition().y);
 
 		//movements:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) //player 1 move right
@@ -107,29 +134,39 @@ int main()
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
-			p2.setTexture(p2tLeft);
-			p2.move(sf::Vector2f(-move, 0));
+			if (!isFiring)
+				arrow.rotate(-1);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
-			p2.setTexture(p2tRight);
-			p2.move(sf::Vector2f(move, 0));
+			if (!isFiring)
+				arrow.rotate(1);
 		}
-		 
-		sf::Vector2f bomb_pos = getBombPos(p1.getPosition().x + p1tRight.getSize().x, p1.getPosition().y, V0, ANGLE, clock.getElapsedTime().asSeconds());
-		printf("%f\n", clock.getElapsedTime().asSeconds());
-		printf("(%f, %f)\n", bomb_pos.x, bomb_pos.y);
-		if(bomb_pos.y < 535)
+		if (isAiming)
+		{
+			if (arrow.getScale().x < 3)
+				arrow.scale(1.01, 1);
+		}
+		
+		sf::Vector2f bomb_pos;
+		if (isFiring)
+		{
+			bomb_pos = getBombPos(bombStartPosition.x, bombStartPosition.y, power, arrow.getRotation() - 180 , clock.getElapsedTime().asSeconds());
 			bomb.setPosition(bomb_pos);
+		}
+		if (bomb_pos.y > HEIGHT)
+		{
+			bomb.setPosition(-1000,-1000);
+			isFiring = false;
+		}
+		
 		if (bomb.getPosition() == p2.getPosition()) printf("P1 has won!!!");
 
 		//draw and display the sprites
 		window.draw(background);
-		window.draw(bomb);
-		if (isAiming)
-		{
-			window.draw(arrow);
-		}
+		if (isFiring)
+			window.draw(bomb);
+		window.draw(arrow);
 		window.draw(p1);
 		window.draw(p2);
 		window.display();
