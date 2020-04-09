@@ -5,29 +5,24 @@
 #define PI (3.14159265)
 #define GRAVITY (500.0f)
 #define MASS (1)
-//#define XFORCE (10)
 #define YFORCE (0)
 #define V0 (500.0f)
 #define ANGLE (70.0f)
 sf::Vector2f getAcceleration(float angle)
 {
-	//double x = (MASS * GRAVITY * cos(angle * PI / 180.0) + XFORCE * cos(angle * PI / 180.0)) / MASS;
 	double y = (MASS * GRAVITY * cos(angle * PI / 180.0) + YFORCE * cos(angle * PI / 180.0)) / MASS;
 	return sf::Vector2f(0, y);
 }
 sf::Vector2f getBombVelocity(float v0, float angle, float dt)
 {
-	//float ax = getAcceleration(angle).x;
 	float ay = getAcceleration(angle).y;
 	float ax = 0;
-	//float ay = 0;
 	double vx = v0 * cos(angle * PI / 180.0) + ax * dt;
 	double vy = v0 * sin(angle * PI / 180.0) - ay * dt;
 	return sf::Vector2f(vx, vy);
 }
 sf::Vector2f getBombPos(float x0, float y0, float v, float angle, float dt)
 {
-	//float ax = getAcceleration(angle).x;
 	float ay = getAcceleration(angle).y;
 	float ax = 0;
 	sf::Vector2f vt = getBombVelocity(v, angle, dt);
@@ -60,6 +55,7 @@ int main()
 	sf::Texture arrowT;
 	if (!arrowT.loadFromFile("Arrow.png")) //load picture
 		return EXIT_FAILURE;
+
 	//sprites:
 	sf::Sprite background(backgroundT);
 	sf::Sprite p1(p1tRight); //insert to sprite player1
@@ -73,15 +69,16 @@ int main()
 	const int GROUND = LENGTH - p1.getTexture()->getSize().y - 50;
 
 	sf::RenderWindow window(sf::VideoMode(WIDTH, LENGTH), "HitOrMiss"); //creat window
+
 	//initiate positions:
 	background.setPosition(0, 0);
 	p1.setPosition(0, GROUND);
 
 	p2.setPosition(WIDTH- p2.getTexture()->getSize().x,GROUND);
 	bomb.setOrigin(bombT.getSize().x / 2, bombT.getSize().y / 2);
-	//bomb.setScale(sf::Vector2f(2.0f, 2.0f));
 	bomb.setPosition(100,100);
 	window.setFramerateLimit(60);
+
 	//the game loop:
 	float move = 5.0f;
 	double angle = 0;
@@ -125,6 +122,7 @@ int main()
 		if(bomb_pos.y < 535)
 			bomb.setPosition(bomb_pos);
 		if (bomb.getPosition() == p2.getPosition()) printf("P1 has won!!!");
+
 		//draw and display the sprites
 		window.draw(background);
 		window.draw(bomb);
@@ -139,47 +137,3 @@ int main()
 
 	return 0;
 }
-
-/*
-#define PI (3.14159265)
-#define GRAVITY (100.0f)
-#define MASS (10)
-#define XFORCE (10)
-#define YFORCE (10)
-sf::Vector2f getAcceleration(float angle)
-{
-	double x = (MASS * GRAVITY * cos(angle * PI / 180.0) + XFORCE * cos(angle * PI / 180.0)) / MASS;
-	double y = (MASS * GRAVITY * cos(angle * PI / 180.0) + YFORCE * cos(angle * PI / 180.0)) / MASS;
-	return sf::Vector2f(x, y);
-}
-sf::Vector2f getBombVelocity(float v0, float angle, float dt)
-{
-	float ax = getAcceleration(angle).x;
-	float ay = getAcceleration(angle).y;
-	//float ax = 0;
-	double vx = v0 * cos(angle * PI / 180.0) + ax * dt;
-	double vy = v0 * sin(angle * PI / 180.0) - GRAVITY * dt;
-	return sf::Vector2f(vx, vy);
-}
-sf::Vector2f getBombPos(float x0, float y0, float v, float angle, float dt)
-{
-	float ax = getAcceleration(angle).x;
-	float ay = getAcceleration(angle).y;
-	//float ax = 0;
-	sf::Vector2f vt = getBombVelocity(v, angle, dt);
-	double x = x0 + vt.x * cos(angle * PI / 180.0) * dt + 0.5 * ax * dt *dt;
-	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt )+ (0.5 * GRAVITY * dt * dt);
-	printf("%f, %f", vt.x, vt.y);
-	return sf::Vector2f(x, y);
-}
-*/
-
-/*
-sf::Vector2f getBombPos(float x0, float y0, float v0, float angle, float t)
-{
-	double x = x0 + v0 * cos(angle * PI / 180.0) * t;
-	double y = y0 + (-v0 * sin(angle * PI / 180.0) * t )+ (0.5 * GRAVITY * t * t);
-
-	return sf::Vector2f(x, y);
-}
-*/
