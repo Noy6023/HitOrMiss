@@ -4,36 +4,25 @@
 
 #define PI (3.14159265)
 #define GRAVITY (500.0f)
-#define YFORCE (0)
 float getAngle(float rotation)
 {
 	if (rotation < 0) return 0;
-	if (rotation < 200) return 0;
+	if (rotation <= 180) return 180;
 	return 360 - rotation;
-}
-sf::Vector2f getAcceleration(float angle)
-{
-	double y = (GRAVITY * sin(angle * PI / 180.0) + YFORCE * sin(angle * PI / 180.0));
-	return sf::Vector2f(0, y);
 }
 sf::Vector2f getBombVelocity(float v0, float angle, float dt)
 {
-	double ay = getAcceleration(angle).y;
-	double ax = 0;
-	double vx = v0 * cos(angle * PI / 180.0) + ax * dt;
-	double vy = v0 * sin(angle * PI / 180.0) - ay * dt;
-	if(angle > 90)
+	double vx = v0 * cos(angle * PI / 180.0);
+	double vy = v0 * sin(angle * PI / 180.0) - GRAVITY * dt;
+	if(angle > 90 || angle == 180)
 		return sf::Vector2f(-vx, vy);
 	return sf::Vector2f(vx, vy);
 }
 sf::Vector2f getBombPos(float x0, float y0, float v, float angle, float dt)
 {
-	float ay = getAcceleration(angle).y;
-	float ax = 0;
-	if (ay == 0) ay = GRAVITY;
 	sf::Vector2f vt = getBombVelocity(v, angle, dt);
-	double x = x0 + vt.x * cos(angle * PI / 180.0) * dt + 0.5 * ax * dt * dt;
-	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt) + (0.5 * ay * dt * dt);	
+	double x = x0 + vt.x * cos(angle * PI / 180.0) * dt;
+	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt) + (0.5 * GRAVITY * dt * dt);	
 	return sf::Vector2f(x, y);
 }
 int main()
@@ -83,6 +72,7 @@ int main()
 	bomb.setOrigin(bombT.getSize().x / 2, bombT.getSize().y / 2);
 	window.setFramerateLimit(60);
 	arrow.setOrigin(0, arrowT.getSize().y / 2);
+	arrow.setRotation(270);
 
 	//the game loop:
 	float move = 5.0f;
@@ -144,12 +134,18 @@ int main()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			if (!isFiring)
-				arrow.rotate(-1);
+			{
+				if(arrow.getRotation() > 180)
+					arrow.rotate(-1);
+			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			if (!isFiring)
-				arrow.rotate(1);
+			{
+				if (arrow.getRotation() < 359)
+					arrow.rotate(1);
+			}
 		}
 		if (isAiming)
 		{
@@ -158,6 +154,7 @@ int main()
 		}
 		
 		sf::Vector2f bomb_pos;
+		printf("rotation = %f \n", arrow.getRotation());
 		if (isFiring)
 		{
 			printf("rotation = %f \n", arrow.getRotation());
@@ -166,7 +163,6 @@ int main()
 			bomb_pos = getBombPos(bombStartPosition.x, bombStartPosition.y, power, angle, clock.getElapsedTime().asSeconds());
 			bomb.setPosition(bomb_pos);
 		}
-		printf("pos: %f,%f", bomb_pos.x, bomb_pos.y);
 		if (bomb_pos.y > HEIGHT)
 		{
 			bomb.setPosition(-1000,-1000);
