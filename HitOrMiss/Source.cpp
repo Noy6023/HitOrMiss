@@ -25,30 +25,57 @@ int main()
 	window.setKeyRepeatEnabled(false);
 	while (window.isOpen())
 	{
-		sf::Event event;
-
-		while (window.pollEvent(event))
+		for (int i = 0; i < 2; i++)
 		{
-			for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
 				players[i].handle_event(event);
 
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
+				if (event.type == sf::Event::Closed)
+					window.close();
+			}
 
-		for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
-		{
 			players[i].handle_movement();
 			players[i].update();
-		}
 
-		//draw and display the sprites
+			//draw and display the sprites
+		}
 		window.draw(background);
 		for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
 			players[i].draw(window);
-		
 		window.display();
 	}
 
 	return 0;
 }
+
+/*
+//the game loop:
+window.setKeyRepeatEnabled(false);
+while (window.isOpen())
+{
+	sf::Event event;
+	while (window.pollEvent(event))
+	{
+		for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
+			players[i].handle_event(event);
+
+		if (event.type == sf::Event::Closed)
+			window.close();
+	}
+
+	for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
+	{
+		players[i].handle_movement();
+		players[i].update();
+	}
+
+	//draw and display the sprites
+	window.draw(background);
+	for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
+		players[i].draw(window);
+
+	window.display();
+return 0;
+}*/

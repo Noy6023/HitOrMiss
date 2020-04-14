@@ -22,26 +22,25 @@ Bomb::~Bomb()
 	printf("Bomb Destruced!\n");
 }
 
-sf::Vector2f getBombVelocity(float v0, float angle, float dt)
+sf::Vector2f getBombVelocity(float v0, float angle, float t)
 {
 	double vx = v0 * cos(angle * PI / 180.0);
-	double vy = v0 * sin(angle * PI / 180.0) - GRAVITY * dt;
+	double vy = v0 * sin(angle * PI / 180.0) - GRAVITY * t;
 	if (angle > 90 || angle == 180)
 		return sf::Vector2f(-vx, vy);
 	return sf::Vector2f(vx, vy);
 }
-sf::Vector2f getBombPos(float x0, float y0, float v, float angle, float dt)
+sf::Vector2f getBombPos(sf::Vector2f initPosition, float v, float angle, float t)
 {
-	sf::Vector2f vt = getBombVelocity(v, angle, dt);
-	double x = x0 + vt.x * cos(angle * PI / 180.0) * dt;
-	double y = y0 + (-vt.y * sin(angle * PI / 180.0) * dt) + (0.5 * GRAVITY * dt * dt);
+	sf::Vector2f vt = getBombVelocity(v, angle, t);
+	double x = initPosition.x + vt.x * cos(angle * PI / 180.0) * t;
+	double y = initPosition.y + (-vt.y * sin(angle * PI / 180.0) * t) + (0.5 * GRAVITY * t * t);
 	return sf::Vector2f(x, y);
 }
 
 void Bomb::shoot(sf::Vector2f initPosition, float angle, float power)
 {
 	m_is_firing = true;
-	//m_sprite.setPosition(initPosition);
 	m_init_position = initPosition;
 	m_angle = angle;
 	m_power = power;
@@ -50,7 +49,7 @@ void Bomb::shoot(sf::Vector2f initPosition, float angle, float power)
 
 void Bomb::update()
 {
-	sf::Vector2f bomb_pos = getBombPos(m_init_position.x, m_init_position.y, m_power, m_angle, m_timer.getElapsedTime().asSeconds());
+	sf::Vector2f bomb_pos = getBombPos(m_init_position, m_power, m_angle, m_timer.getElapsedTime().asSeconds());
 	m_sprite.setPosition(bomb_pos);
 	if (bomb_pos.y > 550)
 	{
