@@ -154,12 +154,9 @@ int main()
 		}
 		
 		sf::Vector2f bomb_pos;
-		printf("rotation = %f \n", arrow.getRotation());
 		if (isFiring)
 		{
-			printf("rotation = %f \n", arrow.getRotation());
 			float angle = getAngle(arrow.getRotation());
-			printf("angle = %f \n", angle);
 			bomb_pos = getBombPos(bombStartPosition.x, bombStartPosition.y, power, angle, clock.getElapsedTime().asSeconds());
 			bomb.setPosition(bomb_pos);
 		}
@@ -168,8 +165,6 @@ int main()
 			bomb.setPosition(-1000,-1000);
 			isFiring = false;
 		}
-		
-		if (bomb.getPosition() == p2.getPosition()) printf("P1 has won!!!");
 
 		//draw and display the sprites
 		window.draw(background);
