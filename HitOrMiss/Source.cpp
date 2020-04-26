@@ -20,33 +20,30 @@ int main()
 
 	Player players[2] = { Player("Resources/p1.png", sf::Vector2f(200,550), 5.0f),
 						Player("Resources/p2.png", sf::Vector2f(800,550), 5.0f, true)};
-
+	int turn = 0;
 	//the game loop:
 	window.setKeyRepeatEnabled(false);
 	while (window.isOpen())
 	{
-		for (int i = 0; i < 2; i++)
+		sf::Event event;
+		while (window.pollEvent(event))
 		{
-			sf::Event event;
-			while (window.pollEvent(event))
-			{
-				players[i].handle_event(event);
-
-				if (event.type == sf::Event::Closed)
-					window.close();
-			}
-
-			players[i].handle_movement();
-			players[i].update();
-
-			//draw and display the sprites
+			players[turn%2].handle_event(event);
+			if (event.type == sf::Event::Closed)
+				window.close();
 		}
+		players[turn%2].handle_movement();
+		for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
+		{
+			players[i].update();
+		}
+		//draw and display the sprites
 		window.draw(background);
 		for (int i = 0; i < sizeof(players) / sizeof(Player); i++)
 			players[i].draw(window);
 		window.display();
+		players[turn % 2].handle_turns(&turn);
 	}
-
 	return 0;
 }
 

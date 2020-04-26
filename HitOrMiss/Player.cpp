@@ -63,6 +63,12 @@ void Player::update()
 	m_bomb.update();
 }
 
+void Player::handle_turns(int* turn)
+{
+	if (m_bomb.get_m_is_firing())
+		* turn = *turn + 1;
+}
+
 void Player::handle_movement()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))

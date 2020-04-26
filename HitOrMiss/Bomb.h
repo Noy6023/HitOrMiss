@@ -7,6 +7,7 @@ public:
 	~Bomb();
 	void shoot(sf::Vector2f initPosition, float angle, float power);
 	void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
+	bool get_m_is_firing();
 	void update();
 private:
 	sf::Texture m_texture;

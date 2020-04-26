@@ -51,7 +51,7 @@ void Bomb::update()
 {
 	sf::Vector2f bomb_pos = getBombPos(m_init_position, m_power, m_angle, m_timer.getElapsedTime().asSeconds());
 	m_sprite.setPosition(bomb_pos);
-	if (bomb_pos.y > 550)
+	if (bomb_pos.y > 525)
 	{
 		m_is_firing = false;
 	}
@@ -61,4 +61,9 @@ void Bomb::draw(sf::RenderTarget& target, sf::RenderStates states)
 {
 	if (m_is_firing)
 		target.draw(m_sprite);
+}
+
+bool Bomb::get_m_is_firing()
+{
+	return m_is_firing;
 }
