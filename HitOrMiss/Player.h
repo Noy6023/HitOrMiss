@@ -9,6 +9,8 @@ public:
 	void handle_event(sf::Event);
 	void update();
 	void handle_turns(int* turn);
+	bool isWin(Player p);
+	sf::Sprite getSprite();
 	void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
 private:
 	sf::Texture m_player_texture;

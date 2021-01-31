@@ -1,6 +1,6 @@
 #include "Player.h"
 Player::Player(std::string filename, sf::Vector2f initPostion, float movementSpeed, bool isFaceingLeft)
-	: m_movement_speed(movementSpeed), m_angle(0), m_power(0), m_is_aiming(false), m_bomb()
+	: m_movement_speed(movementSpeed), m_angle(0), m_power(0), m_is_aiming(false), m_bomb(sf::Vector2f(0,0), sf::Vector2f(0,0))
 {
 	if (!m_player_texture.loadFromFile(filename))
 	{
@@ -19,7 +19,6 @@ Player::Player(std::string filename, sf::Vector2f initPostion, float movementSpe
 	m_arrow_sprite.setTexture(m_arrow_texture);
 	m_arrow_sprite.setOrigin(0, m_arrow_texture.getSize().y / 2);
 	m_arrow_sprite.setRotation(270);
-	
 }
 
 float getAngle(float rotation)
@@ -61,12 +60,27 @@ void Player::update()
 			m_arrow_sprite.scale(1.01, 1);
 	}
 	m_bomb.update();
+
 }
 
 void Player::handle_turns(int* turn)
 {
-	if (m_bomb.get_m_is_firing())
+	if (m_bomb.get_m_stage() == 3)
 		* turn = *turn + 1;
+}
+
+bool Player::isWin(Player p)
+{
+	m_bomb.set_hits(sf::Vector2f(p.getSprite().getPosition()),
+					sf::Vector2f(p.getSprite().getPosition().x + m_player_texture.getSize().x,
+								 p.getSprite().getPosition().y + m_player_texture.getSize().y));
+	if (m_bomb.hasHit())
+		return true;
+}
+
+sf::Sprite Player::getSprite()
+{
+	return m_player_sprite;
 }
 
 void Player::handle_movement()
@@ -92,6 +106,8 @@ void Player::handle_movement()
 			m_arrow_sprite.rotate(1);
 	}
 	m_arrow_sprite.setPosition(m_player_sprite.getPosition().x, m_player_sprite.getPosition().y - 5);
+	m_bomb.set_hits(sf::Vector2f(m_player_sprite.getPosition().x, m_player_sprite.getPosition().y),
+		sf::Vector2f(m_player_sprite.getPosition().x + m_player_texture.getSize().x, m_player_sprite.getPosition().y + m_player_texture.getSize().y));
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states)

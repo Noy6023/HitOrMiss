@@ -3,12 +3,15 @@
 class Bomb
 {
 public:
-	Bomb();
-	~Bomb();
+	Bomb(sf::Vector2f m_min_hit, sf::Vector2f m_max_hit);
+	//~Bomb();
 	void shoot(sf::Vector2f initPosition, float angle, float power);
 	void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
 	bool get_m_is_firing();
+	int get_m_stage();
+	bool hasHit();
 	void update();
+	void set_hits(sf::Vector2f min, sf::Vector2f max);
 private:
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;
@@ -17,5 +20,8 @@ private:
 	float m_angle;
 	float m_power;
 	bool m_is_firing;
+	int m_stage;
+	sf::Vector2f m_min_hit;
+	sf::Vector2f m_max_hit;
 };
 
